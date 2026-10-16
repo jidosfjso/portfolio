@@ -1,0 +1,10 @@
+// 技能管理（预留）：/admin/skills，待阶段 3 实现。
+
+export default function SkillsAdmin() {
+  return (
+    <div>
+      <h1 className="text-2xl font-bold text-ink">技能管理</h1>
+      <p className="mt-4 text-muted">待实现。</p>
+    </div>
+  );
+}
