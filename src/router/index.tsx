@@ -53,6 +53,7 @@ export const router = createBrowserRouter([
       { path: 'skills', element: withSuspense(<SkillsAdmin />) },
       { path: 'projects', element: withSuspense(<ProjectsAdmin />) },
       { path: 'posts', element: withSuspense(<PostsAdmin />) },
+      { path: '*', element: <Navigate to="/admin" replace /> },
     ],
   },
   {

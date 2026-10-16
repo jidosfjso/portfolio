@@ -39,6 +39,7 @@ export default function ConfirmDialog({
       role="dialog"
       aria-modal="true"
       aria-labelledby="confirm-title"
+      aria-describedby="confirm-desc"
     >
       <div
         className="w-full max-w-sm rounded-lg border border-border bg-card p-6"
@@ -47,7 +48,7 @@ export default function ConfirmDialog({
         <h2 id="confirm-title" className="text-lg font-semibold text-ink">
           {title}
         </h2>
-        <p className="mt-2 text-sm text-muted">{description}</p>
+        <p id="confirm-desc" className="mt-2 text-sm text-muted">{description}</p>
         <div className="mt-6 flex justify-end gap-3">
           <button
             ref={cancelRef}

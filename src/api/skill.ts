@@ -1,10 +1,9 @@
-import { read, write, storageKeys } from './client';
+import { readOrSeed, write, storageKeys, delay } from './client';
 import { seedSkills } from '@/data/seed';
 import type { Skill, ApiResult } from '@/types';
 
 function loadAll(): Skill[] {
-  const stored = read<Skill[] | null>(storageKeys.skills, null);
-  return stored ?? seedSkills;
+  return readOrSeed<Skill[]>(storageKeys.skills, seedSkills);
 }
 
 export async function listSkills(): Promise<ApiResult<Skill[]>> {
@@ -36,8 +35,4 @@ export async function removeSkill(id: string): Promise<ApiResult<null>> {
   const all = loadAll().filter((s) => s.id !== id);
   write(storageKeys.skills, all);
   return { success: true, data: null };
-}
-
-function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }

@@ -4,9 +4,9 @@ import type { Profile, Skill, Project, Post } from '@/types';
 
 export const seedProfile: Profile = {
   id: 'profile-1',
-  name: '你的名字',
-  title: '前端开发工程师',
-  bio: '你好，我是一名热爱构建用户体验的前端开发工程师。',
+  name: '星璃',
+  title: '计算机科学与技术本科大四学生',
+  bio: '你好，我是星璃，一名热爱 Web 开发的计算机科学与技术专业学生。',
   avatar: '',
   email: 'hello@example.com',
   socials: [
@@ -16,15 +16,9 @@ export const seedProfile: Profile = {
   timeline: [
     {
       id: 't1',
-      period: '2021 – 至今',
-      title: '前端开发工程师',
-      description: '负责核心产品的前端架构与开发。',
-    },
-    {
-      id: 't2',
-      period: '2017 – 2021',
-      title: '软件工程 · 本科',
-      description: '主修计算机科学，专注 Web 开发。',
+      period: '2023 – 至今',
+      title: '计算机科学与技术本科大四学生',
+      description: '主修计算机科学，专注 Web 前端开发。',
     },
   ],
 };

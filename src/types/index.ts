@@ -79,12 +79,9 @@ export interface LoginResponse {
   user: AdminUser;
 }
 
-// ===== 后台 · 表单（zod 推导）=====
-
-export type ProfileFormValues = Omit<Profile, 'id'>;
-export type SkillFormValues = Omit<Skill, 'id'>;
-export type ProjectFormValues = Omit<Project, 'id'>;
-export type PostFormValues = Omit<Post, 'id'>;
+// ===== 后台 · 表单 =====
+// 表单值类型统一由 zod schema 推导，定义在 src/lib/validators.ts，
+// 此处不再重复声明，避免与 zod 推导结果不一致。
 
 // ===== API 统一返回 =====
 

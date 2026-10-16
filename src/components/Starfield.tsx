@@ -5,7 +5,9 @@ import { useEffect, useRef } from 'react';
 // - requestAnimationFrame 驱动，页面不可见时暂停（document.hidden）；
 // - <640px 降低粒子数量（40），桌面 150；
 // - devicePixelRatio 缩放且上限 2，避免高分屏像素爆炸；
-// - 尊重 prefers-reduced-motion：仅静态绘制一帧，不持续动画。
+// - 尊重 prefers-reduced-motion：仅静态绘制一帧，不持续动画；
+// - resize 用 rAF 节流，避免移动端滚动时频繁重建粒子；
+// - 预生成 alpha 色阶字符串，避免每帧每粒子创建字符串。
 
 interface Particle {
   x: number;
@@ -25,6 +27,21 @@ const MOBILE_COUNT = 40;
 const DESKTOP_COUNT = 150;
 const INK_RGB = '230, 234, 242'; // #E6EAF2
 const ACCENT_RGB = '108, 140, 255'; // #6C8CFF
+const ALPHA_STEPS = 32;
+
+// 预生成 alpha 色阶字符串，避免每帧字符串拼接
+const inkPalette = Array.from({ length: ALPHA_STEPS }, (_, i) => {
+  const a = i / (ALPHA_STEPS - 1);
+  return `rgba(${INK_RGB}, ${a.toFixed(3)})`;
+});
+const accentPalette = Array.from({ length: ALPHA_STEPS }, (_, i) => {
+  const a = i / (ALPHA_STEPS - 1);
+  return `rgba(${ACCENT_RGB}, ${a.toFixed(3)})`;
+});
+
+function alphaIndex(alpha: number): number {
+  return Math.min(ALPHA_STEPS - 1, Math.max(0, Math.round(alpha * (ALPHA_STEPS - 1))));
+}
 
 function createParticles(count: number, width: number, height: number): Particle[] {
   return Array.from({ length: count }, () => ({
@@ -57,15 +74,17 @@ export default function Starfield() {
     let height = 0;
     let particles: Particle[] = [];
     let rafId = 0;
+    let resizeRafId = 0;
 
     const drawFrame = (time: number) => {
       ctx.clearRect(0, 0, width, height);
       for (const p of particles) {
         const twinkle = 0.5 + 0.5 * Math.sin(time * p.twinkleSpeed + p.twinkleOffset);
         const alpha = p.baseAlpha * (0.35 + 0.65 * twinkle);
+        const palette = p.accent ? accentPalette : inkPalette;
+        ctx.fillStyle = palette[alphaIndex(alpha)];
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${p.accent ? ACCENT_RGB : INK_RGB}, ${alpha.toFixed(3)})`;
         ctx.fill();
       }
     };
@@ -80,6 +99,15 @@ export default function Starfield() {
       const count = width < MOBILE_BREAKPOINT ? MOBILE_COUNT : DESKTOP_COUNT;
       particles = createParticles(count, width, height);
       drawFrame(0);
+    };
+
+    // rAF 节流 resize，避免移动端滚动地址栏收起时高频触发
+    const scheduleResize = () => {
+      if (resizeRafId) return;
+      resizeRafId = requestAnimationFrame(() => {
+        resizeRafId = 0;
+        resize();
+      });
     };
 
     const step = (time: number) => {
@@ -110,13 +138,14 @@ export default function Starfield() {
     };
 
     resize();
-    window.addEventListener('resize', resize);
+    window.addEventListener('resize', scheduleResize);
     document.addEventListener('visibilitychange', handleVisibility);
     start();
 
     return () => {
       cancelAnimationFrame(rafId);
-      window.removeEventListener('resize', resize);
+      cancelAnimationFrame(resizeRafId);
+      window.removeEventListener('resize', scheduleResize);
       document.removeEventListener('visibilitychange', handleVisibility);
     };
   }, []);

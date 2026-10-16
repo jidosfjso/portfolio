@@ -38,3 +38,18 @@ export const storageKeys = {
   token: 'token',
   user: 'user',
 } as const;
+
+// 模拟网络延迟，让上层可用 async/await，切换真实后端时直接删除即可。
+export function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// 首次读取时若 storage 为空，先把 seed 写入再返回，保证后续编辑真正持久化。
+export function readOrSeed<T>(key: string, seed: T): T {
+  const existing = read<T | null>(key, null);
+  if (existing === null) {
+    write(key, seed);
+    return seed;
+  }
+  return existing;
+}

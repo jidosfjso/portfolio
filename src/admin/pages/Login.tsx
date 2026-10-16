@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { useAuth } from '@/admin/auth/useAuth';
 import { Input } from '@/admin/components/FormField';
 import { loginSchema, type LoginFormValues } from '@/lib/validators';
@@ -12,8 +12,13 @@ import { loginSchema, type LoginFormValues } from '@/lib/validators';
 export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login } = useAuth();
+  const { login, isAuthed } = useAuth();
   const [submitError, setSubmitError] = useState<string | null>(null);
+
+  // 已登录用户直接进入后台
+  if (isAuthed) {
+    return <Navigate to="/admin" replace />;
+  }
 
   const {
     register,

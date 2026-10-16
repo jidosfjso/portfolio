@@ -12,15 +12,26 @@ export const loginSchema = z.object({
 });
 export type LoginFormValues = z.infer<typeof loginSchema>;
 
+// ===== 联系表单 =====
+
+export const contactSchema = z.object({
+  name: z.string().min(1, '请输入姓名').max(50, '姓名过长'),
+  email: z.email('请输入有效邮箱'),
+  message: z.string().min(1, '请输入留言内容').max(1000, '留言最多 1000 字'),
+});
+export type ContactFormValues = z.infer<typeof contactSchema>;
+
 // ===== 个人信息 =====
 
 export const socialLinkSchema = z.object({
+  id: z.string().optional(),
   label: z.string().min(1, '请输入名称'),
   url: z.url('请输入有效链接'),
 });
 export type SocialLinkFormValues = z.infer<typeof socialLinkSchema>;
 
 export const timelineItemSchema = z.object({
+  id: z.string().optional(),
   period: z.string().min(1, '请输入时间区间'),
   title: z.string().min(1, '请输入标题'),
   description: z.string().optional(),

@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { profileApi } from '@/api';
+import { remove, storageKeys } from '@/api/client';
 import { Input, Textarea } from '@/admin/components/FormField';
+import ConfirmDialog from '@/admin/components/ConfirmDialog';
 import { profileSchema, type ProfileFormValues } from '@/lib/validators';
 
 // 个人信息管理：react-hook-form + zod，社交链接 / 时间线支持增删。
@@ -11,6 +13,7 @@ type Feedback = { type: 'success' | 'error'; text: string } | null;
 
 export default function Settings() {
   const [feedback, setFeedback] = useState<Feedback>(null);
+  const [resetOpen, setResetOpen] = useState(false);
 
   const {
     register,
@@ -45,8 +48,9 @@ export default function Settings() {
         bio: p.bio,
         avatar: p.avatar,
         email: p.email,
-        socials: p.socials.map((s) => ({ label: s.label, url: s.url })),
+        socials: p.socials.map((s) => ({ id: s.id, label: s.label, url: s.url })),
         timeline: p.timeline.map((t) => ({
+          id: t.id,
           period: t.period,
           title: t.title,
           description: t.description,
@@ -58,6 +62,15 @@ export default function Settings() {
     };
   }, [reset]);
 
+  const resetToDefault = () => {
+    remove(storageKeys.profile);
+    remove(storageKeys.skills);
+    remove(storageKeys.projects);
+    remove(storageKeys.posts);
+    setResetOpen(false);
+    window.location.reload();
+  };
+
   const onSubmit = async (values: ProfileFormValues) => {
     setFeedback(null);
     const res = await profileApi.updateProfile({
@@ -66,9 +79,13 @@ export default function Settings() {
       bio: values.bio ?? '',
       avatar: values.avatar ?? '',
       email: values.email,
-      socials: values.socials.map((s) => ({ id: crypto.randomUUID(), ...s })),
+      socials: values.socials.map((s) => ({
+        id: s.id ?? crypto.randomUUID(),
+        label: s.label,
+        url: s.url,
+      })),
       timeline: values.timeline.map((t) => ({
-        id: crypto.randomUUID(),
+        id: t.id ?? crypto.randomUUID(),
         period: t.period,
         title: t.title,
         description: t.description ?? '',
@@ -215,6 +232,26 @@ export default function Settings() {
           {isSubmitting ? '保存中…' : '保存'}
         </button>
       </form>
+
+      <div className="mt-10 border-t border-border pt-6">
+        <h2 className="font-medium text-ink">数据管理</h2>
+        <p className="mt-1 text-sm text-muted">清除当前所有本地数据，恢复为默认示例数据（修改 seed.ts 后可用此功能刷新）。</p>
+        <button
+          type="button"
+          onClick={() => setResetOpen(true)}
+          className="mt-3 rounded-md border border-border px-5 py-2 text-sm text-muted transition-colors hover:border-red-400 hover:text-red-400"
+        >
+          恢复默认数据
+        </button>
+      </div>
+
+      <ConfirmDialog
+        open={resetOpen}
+        title="恢复默认数据"
+        description="将清除所有个人信息、技能、项目和博客文章，恢复为默认示例数据。此操作不可撤销。"
+        onConfirm={resetToDefault}
+        onCancel={() => setResetOpen(false)}
+      />
     </div>
   );
 }

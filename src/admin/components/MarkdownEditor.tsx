@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import MarkdownRenderer from '@/features/markdown/MarkdownRenderer';
 
 // Markdown 编辑器：编辑 / 分屏 / 预览三种模式，实时预览。
+// 预览内容做 200ms 防抖，避免长文档下每次按键都全量解析 Markdown。
 // 供后台博客、项目管理复用。
 
 type Mode = 'edit' | 'split' | 'preview';
@@ -17,8 +18,20 @@ const MODES: { key: Mode; label: string }[] = [
   { key: 'preview', label: '预览' },
 ];
 
+const PREVIEW_DEBOUNCE_MS = 200;
+
 export default function MarkdownEditor({ value, onChange }: MarkdownEditorProps) {
   const [mode, setMode] = useState<Mode>('split');
+  const [preview, setPreview] = useState(value);
+  const timerRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (timerRef.current) window.clearTimeout(timerRef.current);
+    timerRef.current = window.setTimeout(() => setPreview(value), PREVIEW_DEBOUNCE_MS);
+    return () => {
+      if (timerRef.current) window.clearTimeout(timerRef.current);
+    };
+  }, [value]);
 
   return (
     <div className="overflow-hidden rounded-lg border border-border">
@@ -51,7 +64,7 @@ export default function MarkdownEditor({ value, onChange }: MarkdownEditorProps)
         )}
         {mode !== 'edit' && (
           <div className="min-h-72 overflow-auto border-t border-border px-4 py-3 md:border-t-0">
-            <MarkdownRenderer content={value} />
+            <MarkdownRenderer content={preview} />
           </div>
         )}
       </div>

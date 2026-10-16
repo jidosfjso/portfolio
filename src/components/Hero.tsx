@@ -87,7 +87,7 @@ export default function Hero() {
                 <a
                   href={social.url}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   className="text-sm text-muted transition-colors hover:text-accent"
                 >
                   {social.label}

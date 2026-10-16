@@ -1,8 +1,8 @@
-import { read, remove, write, storageKeys } from './client';
+import { read, remove, write, storageKeys, delay } from './client';
 import type { LoginPayload, LoginResponse, ApiResult, AdminUser } from '@/types';
 
 // 演示阶段的账号与「后端」校验逻辑。
-// 注意：真实密码不应存放在前端，此处仅用于 localStorage 模拟阶段。
+// TODO: 接入真实后端后必须删除此处硬编码凭证，改由服务端校验。
 const DEMO_USERNAME = 'admin';
 const DEMO_PASSWORD = 'admin123';
 
@@ -42,8 +42,4 @@ export function getCurrentUser(): AdminUser | null {
 
 export function isAuthenticated(): boolean {
   return getToken() !== null;
-}
-
-function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }
