@@ -36,4 +36,5 @@ export const storageKeys = {
   projects: 'projects',
   posts: 'posts',
   token: 'token',
+  user: 'user',
 } as const;

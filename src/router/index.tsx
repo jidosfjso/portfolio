@@ -15,6 +15,9 @@ const NotFound = lazy(() => import('@/pages/NotFound'));
 const AdminLogin = lazy(() => import('@/admin/pages/Login'));
 const Dashboard = lazy(() => import('@/admin/pages/Dashboard'));
 const Settings = lazy(() => import('@/admin/pages/Settings'));
+const SkillsAdmin = lazy(() => import('@/admin/pages/SkillsAdmin'));
+const ProjectsAdmin = lazy(() => import('@/admin/pages/ProjectsAdmin'));
+const PostsAdmin = lazy(() => import('@/admin/pages/PostsAdmin'));
 
 const withSuspense = (node: React.ReactNode) => (
   <Suspense fallback={<div className="p-8 text-center text-muted">加载中…</div>}>{node}</Suspense>
@@ -47,7 +50,9 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: withSuspense(<Dashboard />) },
       { path: 'settings', element: withSuspense(<Settings />) },
-      // 后续迭代：posts / projects / skills 管理页
+      { path: 'skills', element: withSuspense(<SkillsAdmin />) },
+      { path: 'projects', element: withSuspense(<ProjectsAdmin />) },
+      { path: 'posts', element: withSuspense(<PostsAdmin />) },
     ],
   },
   {

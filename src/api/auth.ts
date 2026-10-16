@@ -17,8 +17,9 @@ export async function login(payload: LoginPayload): Promise<ApiResult<LoginRespo
       username: DEMO_USERNAME,
       displayName: '站长',
     };
-    // 只存 token，不存密码
+    // 只存 token，不存密码；user 仅存展示信息，不存敏感数据
     write(storageKeys.token, token);
+    write(storageKeys.user, user);
     return { success: true, data: { token, user } };
   }
 
@@ -27,11 +28,16 @@ export async function login(payload: LoginPayload): Promise<ApiResult<LoginRespo
 
 export async function logout(): Promise<ApiResult<null>> {
   remove(storageKeys.token);
+  remove(storageKeys.user);
   return { success: true, data: null };
 }
 
 export function getToken(): string | null {
   return read<string | null>(storageKeys.token, null);
+}
+
+export function getCurrentUser(): AdminUser | null {
+  return read<AdminUser | null>(storageKeys.user, null);
 }
 
 export function isAuthenticated(): boolean {
